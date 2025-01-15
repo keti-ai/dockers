@@ -1,0 +1,41 @@
+#custom definitions
+PATH=/usr/local/cuda/bin:$PATH
+LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+
+
+WORKDIR=/media/keti/workdir/projects
+ROSWS=~/ros2_ws/src
+ROSPY=/media/keti/workdir/venvs/py38vir/bin/python3
+
+alias chown_keti='sudo chown -R keti .'
+alias sb='source ~/.bashrc'
+alias eb='sudo gedit ~/.bashrc'
+alias about_pc='lsb_release -a'
+alias create_py_simple_pkg='cookiecutter https://github.com/mtbui2010/python_pkg_simple_template.git'
+alias vscode='sudo code --no-sandbox --user-data-dir ~/.vscode_cache'
+
+#docker
+alias docker_start='sudo docker start'
+alias docker_stop='sudo docker stop'
+alias docker_run='sudo docker run -it'
+alias docker_watch='sudo watch docker ps -a'
+alias image_watch='sudo watch docker image ls -a'
+alias image_rm='sudo docker image rm'
+alias sr='source /opt/ros/foxy/setup.bash'
+alias srs='source ~/ros2_ws/install/setup.bash'
+
+#functions
+dockerexec() {
+  sudo docker start "$@" & sudo docker exec -it "$@" /bin/bash
+}
+dockerrm() {
+  sudo docker stop "$@" & sudo docker rm "$@"
+}
+dockerbuildtemp() {
+  sudo docker build -f "$@" -t image:temp . & sudo docker run -it --name con_temp image:temp
+}
+launchros2pkg() {
+  ros2 launch "$@" "$@"_node.launch.py
+}
+
+alias run_kcare22='xhost local: & dockerexec kcare22'
