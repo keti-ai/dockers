@@ -1,0 +1,35 @@
+#################### Pull nvidia docker image from dockerhub
+FROM mtbui2010/ubuntu22.04:cuda11.7-ros.humble
+
+# install utils
+RUN apt-get update
+RUN apt install wget -y
+
+# install ssh
+RUN apt update && apt install -y openssh-server
+RUN sed -i 's/^#PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+RUN sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+RUN echo "root:1" | chpasswd
+RUN service ssh restart
+
+#alias
+RUN echo "ROSWS=/root/ros2_ws/src" >> /root/.bashrc
+RUN echo "ROSPY=python3" >> /root/.bashrc
+
+RUN echo "alias eb='nano ~/.bashrc'" >> /root/.bashrc
+RUN echo "alias sb='source ~/.bashrc'" >> /root/.bashrc
+
+RUN echo 'launchros2pkg() {' >> /root/.bashrc
+RUN echo '  ros2 launch "$@" "$@"_node.launch.py' >> /root/.bashrc
+RUN echo '}' >> /root/.bashrc
+
+RUN echo 'runros2pkg() {' >> /root/.bashrc
+RUN echo '  ros2 run "$@" "$@"_node' >> /root/.bashrc
+RUN echo '}' >> /root/.bashrc
+
+# start ssh
+EXPOSE 22
+ENTRYPOINT service ssh start && bash
+CMD ["/usr/sbin/sshd", "-D"]
+
