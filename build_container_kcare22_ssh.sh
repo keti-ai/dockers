@@ -17,8 +17,6 @@ sudo docker run \
 -v=$SHARE_DIR:$SHARE_DIR \
 -w=$SHARE_DIR \
 -p 2222:22 \
--p 8801:8801 \
--p 8802:8802 \
--p 8803:8803 \
+-p 8800-8809:8800-8809 \
 $IMAGE_NAME
 #--net host \
