@@ -3,7 +3,7 @@
 # ======================= INPUT VALIDATION =======================
 # Check if the correct number of arguments is provided
 if [ $# < 3 ]; then
-    echo "Usage: $0 <UBUNTU_VERSION> <CUDA_VERSION> <ROS_DISTRO> <CONTAINER_NAME> <SHARE_DIR>"
+    echo "Usage: $0 <UBUNTU_VERSION> <CUDA_VERSION> <ROS_DISTRO> <CONTAINER_NAME> <SHARE_DIR> <SSH_PORT> <PORT_MAP> "
     exit 1
 fi
 

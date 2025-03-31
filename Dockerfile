@@ -54,17 +54,15 @@ RUN pip install Pillow==9.5.0
 
 RUN /bin/bash -c ' \
     echo "Using Ubuntu ${UBUNTU_VERSION} with CUDA ${CUDA_VERSION}"; \
-    if [ "${UBUNTU_VERSION}" = "20.04" ]; then \
+    if [ "${CUDA_VERSION}" = "11.1.1" ]; then \
       pip install torch==1.10.1+cu111 torchvision==0.11.2+cu111 torchaudio==0.10.1 -f https://download.pytorch.org/whl/cu111/torch_stable.html; \
-    elif [ "${UBUNTU_VERSION}" = "22.04" ]; then \
-      if [ "${CUDA_VERSION}" = "11.7.1" ]; then \
-        pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117; \
-      elif [ "${CUDA_VERSION}" = "12.1.0" ]; then \
-        pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121; \
-      else \
-        echo "❌ Unsupported"; \
-      fi; \
-    elif [ "${UBUNTU_VERSION}" = "24.04" ]; then \
+    elif [ "${CUDA_VERSION}" = "11.7.1" ]; then \
+      pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117; \
+    elif [ "${CUDA_VERSION}" = "12.1.0" ]; then \
+      pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121; \
+    elif [ "${CUDA_VERSION}" = "12.4.1" ]; then \
+      pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124; \
+    elif [ "${CUDA_VERSION}" = "12.6.3" ]; then \
       pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126; \
     else \
       echo "❌ Unsupported"; \
