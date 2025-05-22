@@ -1,48 +1,95 @@
 #!/bin/bash
 
-# ======================= INPUT VALIDATION =======================
-# Check if the correct number of arguments is provided
-if [ $# < 3 ]; then
-    echo "Usage: $0 <UBUNTU_VERSION> <CUDA_VERSION> <ROS_DISTRO> <CONTAINER_NAME> <SHARE_DIR> <SSH_PORT> <PORT_MAP> "
-    exit 1
+# ======================= DEFAULTS =======================
+UBUNTU_VERSION="22.04"
+CUDA_VERSION="11.7.1"
+ROS_DISTRO="humble"
+PORT=""
+PORT_MAP=""
+SHARE_DIR=""
+CONTAINER_NAME=""
+
+# ======================= ARGUMENT PARSING =======================
+for arg in "$@"; do
+    case $arg in
+        --ubuntu=*)
+            UBUNTU_VERSION="${arg#*=}"
+            ;;
+        --cuda=*)
+            CUDA_VERSION="${arg#*=}"
+            ;;
+        --ros=*)
+            ROS_DISTRO="${arg#*=}"
+            ;;
+        --name=*)
+            CONTAINER_NAME="${arg#*=}"
+            ;;
+        --port=*)
+            PORT="${arg#*=}"
+            ;;
+        --port-map=*)
+            PORT_MAP="${arg#*=}"
+            ;;
+        --share-dir=*)
+            SHARE_DIR="${arg#*=}"
+            ;;
+        *)
+            echo "❌ Unknown argument: $arg"
+            echo "Usage: $0 [--ubuntu=] [--cuda=] [--ros=] [--name=] [--port=] [--port-map=] [--share-dir=]"
+            exit 1
+            ;;
+    esac
+done
+
+# Generate default container name if not provided
+if [[ -z "$CONTAINER_NAME" ]]; then
+    UBUNTU_MAJOR=${UBUNTU_VERSION%%.*}
+    CUDA_MAJOR=${CUDA_VERSION%%.*}
+    CONTAINER_NAME="u${UBUNTU_MAJOR}cu${CUDA_MAJOR}"
 fi
 
-UBUNTU_VERSION=${1:-22.04}
-CUDA_VERSION=${2:-11.7.1}
-ROS_DISTRO=${3:-humble}
-CONTAINER_NAME=${4:-kcare}
-PORT=${5:-2222}
-PORT_MAP=${6:-8800-8809:8800-8809}
-SHARE_DIR=${7:-/media/keti/workdir/projects}
-
-# ======================= BUILD PROCESS =======================
-DOCKERFILE=Dockerfile
+# ======================= DISPLAY CONFIG =======================
 IMAGE_NAME="mtbui2010/ubuntu${UBUNTU_VERSION}:cuda${CUDA_VERSION}-ros2${ROS_DISTRO}"
 
 echo "======================================="
-echo "🚀 Building Docker Image"
-echo "Ubuntu:    ${UBUNTU_VERSION}"
-echo "CUDA:      ${CUDA_VERSION}"
-echo "ROS 2:     ${ROS_DISTRO}"
-echo "Container: ${CONTAINER_NAME}"
-echo "Port: 	 ${PORT}"
-echo "Port MAP:  ${PORT_MAP}"
-echo "Share dir: ${SHARE_DIR}"
-echo "Tag:       ${IMAGE_NAME}"
+echo "🚀 Running Docker Container"
+echo "Ubuntu:     ${UBUNTU_VERSION}"
+echo "CUDA:       ${CUDA_VERSION}"
+echo "ROS 2:      ${ROS_DISTRO}"
+echo "Container:  ${CONTAINER_NAME}"
+echo "Port:       ${PORT:-<host network>}"
+echo "Port MAP:   ${PORT_MAP:-<host network>}"
+echo "Share dir:  ${SHARE_DIR:-<none>}"
+echo "Image tag:  ${IMAGE_NAME}"
 echo "======================================="
 
-sudo docker run \
---name $CONTAINER_NAME \
+# ======================= DOCKER RUN =======================
+DOCKER_CMD="sudo docker run \
+--name ${CONTAINER_NAME} \
 -it \
 -d \
 --gpus all \
 --privileged \
---env="DISPLAY=:0.0" \
+--env=\"DISPLAY=:0.0\" \
 -v=/tmp/.X11-unix:/tmp/.X11-unix:ro \
--v=/dev:/dev \
--v=$SHARE_DIR:$SHARE_DIR \
--w=$SHARE_DIR \
--p ${PORT}:22 \
--p ${PORT_MAP} \
-$IMAGE_NAME
-#--net host \
+-v=/dev:/dev"
+
+# Conditionally mount SHARE_DIR
+if [[ -n "$SHARE_DIR" ]]; then
+    DOCKER_CMD+=" -v=${SHARE_DIR}:${SHARE_DIR} -w=${SHARE_DIR}"
+fi
+
+# Conditionally expose ports or fallback to host networking
+if [[ -n "$PORT" || -n "$PORT_MAP" ]]; then
+    [[ -n "$PORT" ]] && DOCKER_CMD+=" -p ${PORT}:22"
+    [[ -n "$PORT_MAP" ]] && DOCKER_CMD+=" -p ${PORT_MAP}"
+else
+    DOCKER_CMD+=" --net host"
+fi
+
+# Add image name at the end
+DOCKER_CMD+=" ${IMAGE_NAME}"
+
+# ======================= EXECUTE =======================
+eval $DOCKER_CMD
+

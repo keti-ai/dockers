@@ -43,7 +43,7 @@ RUN sed -i 's/^#PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/s
 #################### Install Python Packages
 RUN pip install --upgrade pip
 RUN pip install opencv-python==4.5.5.64  
-RUN pip install numpy==1.26.4
+#RUN pip install numpy==1.26.4
 RUN pip install pyrealsense2 
 RUN pip install gdown 
 RUN pip install imutils 

@@ -3,20 +3,38 @@
 # ======================= CONFIGURATION =======================
 # Define allowed versions
 VALID_UBUNTU=("20.04" "22.04" "24.04")
-VALID_CUDA=("11.1.1" "11.7.1" "12.1.0" "12.4.1" "12.6.3")
+VALID_CUDA=("11.1.1" "11.7.1" "12.1.0" "12.6.3")
 VALID_ROS=("foxy" "humble" "jazzy")
 
+# Default values
+UBUNTU_VERSION="22.04"
+CUDA_VERSION="11.7.1"
+ROS_DISTRO="humble"
+
+# ======================= ARGUMENT PARSING =======================
+for arg in "$@"; do
+    case $arg in
+        --ubuntu=*)
+            UBUNTU_VERSION="${arg#*=}"
+            shift
+            ;;
+        --cuda=*)
+            CUDA_VERSION="${arg#*=}"
+            shift
+            ;;
+        --ros=*)
+            ROS_DISTRO="${arg#*=}"
+            shift
+            ;;
+        *)
+            echo "❌ Unknown argument: $arg"
+            echo "Usage: $0 [--ubuntu=<version>] [--cuda=<version>] [--ros=<distro>]"
+            exit 1
+            ;;
+    esac
+done
+
 # ======================= INPUT VALIDATION =======================
-# Check if the correct number of arguments is provided
-if [ $# -ne 3 ]; then
-    echo "Usage: $0 <UBUNTU_VERSION> <CUDA_VERSION> <ROS_DISTRO>"
-    exit 1
-fi
-
-UBUNTU_VERSION=${1:-22.04}
-CUDA_VERSION=${2:-11.7.1}
-ROS_DISTRO=${3:-humble}
-
 # Function to check if a value exists in an array
 function is_valid() {
     local value=$1
