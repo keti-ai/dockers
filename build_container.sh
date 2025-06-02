@@ -72,7 +72,7 @@ DOCKER_CMD="sudo docker run \
 --privileged \
 --env=\"DISPLAY=:0.0\" \
 -v=/tmp/.X11-unix:/tmp/.X11-unix:ro \
--v=/dev:/dev"
+--ipc host
 
 # Conditionally mount SHARE_DIR
 if [[ -n "$SHARE_DIR" ]]; then
