@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # ======================= CONFIGURATION =======================
 # Define allowed versions
 VALID_UBUNTU=("20.04" "22.04" "24.04")
