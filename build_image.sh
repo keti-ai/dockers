@@ -3,12 +3,12 @@
 # ======================= CONFIGURATION =======================
 # Define allowed versions
 VALID_UBUNTU=("20.04" "22.04" "24.04")
-VALID_CUDA=("11.1.1" "11.7.1" "12.1.0" "12.6.3")
+VALID_CUDA=("11.1.1" "11.7.1" "12.1.0" "12.4.1" "12.6.3")
 VALID_ROS=("foxy" "humble" "jazzy")
 
 # Default values
 UBUNTU_VERSION="22.04"
-CUDA_VERSION="11.7.1"
+CUDA_VERSION="12.6.3"
 ROS_DISTRO="humble"
 
 # ======================= ARGUMENT PARSING =======================
