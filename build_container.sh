@@ -64,20 +64,20 @@ echo "Image tag:  ${IMAGE_NAME}"
 echo "======================================="
 
 # ======================= DOCKER RUN =======================
-DOCKER_CMD=(sudo docker run
+DOCKER_CMD=(docker run
     --name "$CONTAINER_NAME"
     -it
     -d
     --gpus all
     --privileged
     --env="DISPLAY=:0.0"
-    -v=/tmp/.X11-unix:/tmp/.X11-unix:ro
+    -v=/tmp/.X11-unix:/tmp/.X11-unix
     --ipc host
 )
 
 # Conditionally mount SHARE_DIR
 if [[ -n "$SHARE_DIR" ]]; then
-    DOCKER_CMD+=(-v "${SHARE_DIR}:${SHARE_DIR}" -w "${SHARE_DIR}")
+    DOCKER_CMD+=(-v "${SHARE_DIR}:/workdir" -w "/workdir")
 fi
 
 # Conditionally expose ports or fallback to host networking
